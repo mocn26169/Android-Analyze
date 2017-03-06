@@ -3,6 +3,7 @@ package com.mwf.analyze.intf;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**
@@ -10,7 +11,7 @@ import retrofit2.http.Query;
  */
 public interface IFamousInfo {
 
-    @GET("/analysis")
+    @POST("/analysis")
     Call<String> getFamousResult(@Query("api_key") String api_key,
                                        @Query("text") String text,
                                        @Query("pattern") String pattern,

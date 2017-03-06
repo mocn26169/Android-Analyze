@@ -106,60 +106,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-
+private void openFile(DialogSelectionListener listener){
+    DialogProperties properties = new DialogProperties();
+    properties.selection_mode = DialogConfigs.SINGLE_MODE;
+    properties.selection_type = DialogConfigs.FILE_SELECT;
+    properties.root = new File(DialogConfigs.DEFAULT_DIR);
+    properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
+    properties.offset = new File(DialogConfigs.DEFAULT_DIR);
+    properties.extensions = null;
+    FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties);
+    dialog.setTitle("选择一个文件");
+    dialog.setDialogSelectionListener(listener);
+    dialog.show();
+}
     /**
      * 选择文件解析
      */
     private void parseFile() {
-        DialogProperties properties = new DialogProperties();
-        properties.selection_mode = DialogConfigs.SINGLE_MODE;
-        properties.selection_type = DialogConfigs.FILE_SELECT;
-        properties.root = new File(DialogConfigs.DEFAULT_DIR);
-        properties.error_dir = new File(DialogConfigs.DEFAULT_DIR);
-        properties.offset = new File(DialogConfigs.DEFAULT_DIR);
-        properties.extensions = null;
-
-        FilePickerDialog dialog = new FilePickerDialog(MainActivity.this, properties);
-        dialog.setTitle("Select a File");
-        dialog.setDialogSelectionListener(new DialogSelectionListener() {
+        DialogSelectionListener listener = new DialogSelectionListener() {
             @Override
             public void onSelectedFilePaths(String[] files) {
                 String string = FileUtils.readTxtFile(files[0]);
                 if (!TextUtils.isEmpty(string)) {
                     Log.e(TAG, string);
                     mEditKeyWord.setText(string);
-                    parseF(string);
-                }
 
+                    famousInfoModel.queryLookUp(initParams(string)).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            String result = response.body().trim();
+                            CloudResultPlainParse parse = new CloudResultPlainParse();
+                            ArrayList<String> list = parse.parse(result);
+//                    Log.e(TAG, "result====" + result);
+                            String string = "";
+                            for (String tmp : list) {
+                                string += tmp + "\n";
+                                Log.e(TAG, tmp.toString());
+                            }
+                            mTxtContent.setText(string);
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+
+                        }
+                    });
+                }
             }
-        });
-        dialog.show();
+        };
+       openFile(listener);
     }
 
     /**
-     * 解析文件的网络请求
+     * 文件解析并保存到sql
      * @param text
      */
-    private void parseF(String text) {
-        famousInfoModel.queryLookUp(initParams(text)).enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                String result = response.body().trim();
-                CloudResultPlainParse parse = new CloudResultPlainParse();
-                ArrayList<String> list = parse.parse(result);
-//                    Log.e(TAG, "result====" + result);
-                String string = "";
-                for (String tmp : list) {
-                    string += tmp + "\n";
-                    Log.e(TAG, tmp.toString());
-                }
-                mTxtContent.setText(string);
-            }
+    private void parseFileToSQL(String text) {
 
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-
-            }
-        });
     }
+
+
+
+
 }
