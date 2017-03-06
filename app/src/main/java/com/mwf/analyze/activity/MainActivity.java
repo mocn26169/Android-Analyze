@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         famousInfoModel = FamousInfoModel.getInstance(this);
+        getSupportActionBar().hide();
     }
 
     @Override
