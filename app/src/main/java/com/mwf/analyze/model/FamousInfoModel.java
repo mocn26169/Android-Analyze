@@ -9,6 +9,9 @@ import com.mwf.analyze.intf.IFamousInfo;
 
 import retrofit2.Call;
 
+/**
+ * 网络请求单例
+ */
 public class FamousInfoModel {
     private static FamousInfoModel famousInfoModel;
     private IFamousInfo mIFamousInfo;

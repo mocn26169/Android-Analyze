@@ -11,6 +11,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 
+/**
+ * 网络请求主体
+ */
 public class RetrofitWrapper {
     private static RetrofitWrapper instance;
     private Context mContext;
@@ -18,10 +21,11 @@ public class RetrofitWrapper {
 
     public RetrofitWrapper(String url) {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        // Log
+
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
             @Override
             public void log(String message) {
+                // 打印Log
                 Log.i("OkHttp", message);
             }
         });

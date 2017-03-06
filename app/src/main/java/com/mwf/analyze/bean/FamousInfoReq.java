@@ -1,6 +1,8 @@
 package com.mwf.analyze.bean;
 
-
+/**
+ * 请求的参数实体
+ */
 public class FamousInfoReq {
     /**
      * 	用户注册语音云服务后获得的认证标识

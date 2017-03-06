@@ -5,6 +5,9 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
+/**
+ * 请求参数接口
+ */
 public interface IFamousInfo {
 
     @GET("/analysis")

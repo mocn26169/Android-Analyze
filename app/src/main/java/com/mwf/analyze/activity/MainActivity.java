@@ -63,6 +63,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /**
+     * 初始化请求参数
+     * @param text
+     * @return
+     */
     private FamousInfoReq initParams(String text) {
         FamousInfoReq mFamousInfoReq = null;
         mFamousInfoReq = new FamousInfoReq();
@@ -73,6 +78,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return mFamousInfoReq;
     }
 
+    /**
+     * 解析输入框内容
+     */
     private void parseEditext() {
         String text = mEditKeyWord.getText().toString();
 
@@ -128,6 +136,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog.show();
     }
 
+    /**
+     * 解析文件的网络请求
+     * @param text
+     */
     private void parseF(String text) {
         famousInfoModel.queryLookUp(initParams(text)).enqueue(new Callback<String>() {
             @Override

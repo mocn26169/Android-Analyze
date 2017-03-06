@@ -5,6 +5,9 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 
+/**
+ * 请求的结果的数据解析
+ */
 public class CloudResultPlainParse {
     private ArrayList<String> statuses = new ArrayList<>();
 

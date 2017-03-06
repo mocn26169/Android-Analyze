@@ -1,6 +1,8 @@
 package com.mwf.analyze.bean;
 
-
+/**
+ * 请求数据模型
+ */
 public class CloudResult {
     private String id;
     private String cont;

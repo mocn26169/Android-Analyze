@@ -6,9 +6,8 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
 /**
- * Created by m on 2017/3/6.
+ * 文件管理工具
  */
-
 public class FileUtils {
     /**
      * 功能：Java读取txt文件的内容
