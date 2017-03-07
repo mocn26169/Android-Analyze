@@ -14,6 +14,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 数据库工具类
+ */
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 {
     /**
@@ -59,9 +62,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
     /**
      * 单例获取该Helper
-     *
-     * @param context
-     * @return
      */
     public static synchronized DatabaseHelper getHelper(Context context)
     {

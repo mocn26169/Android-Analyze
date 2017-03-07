@@ -22,19 +22,35 @@ import java.util.regex.Pattern;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class SqlService extends IntentService {
+/**
+ * 处理词的服务类
+ */
+public class ParseTermService extends IntentService {
 
     public final String TAG = this.getClass().getName();
+    /**
+     * 更新界面回调
+     */
     private static IUpdateUI iUpdateUI;
+
+    /**
+     * 结束加载回调
+     */
     private static ILoadFinish iLoadFinish;
+
+    /**
+     * 网络请求
+     */
     private FamousInfoModel famousInfoModel;
-    AnalyzeDao dao;
 
-    public SqlService() {
-        super("com.mwf.analyze.services.SqlService");
-//        Log.e(TAG, "SqlService connect");
+    /**
+     * 数据库访问
+     */
+    private AnalyzeDao dao;
+
+    public ParseTermService() {
+        super("com.mwf.analyze.services.ParseTermService");
         famousInfoModel = FamousInfoModel.getInstance(this);
-
     }
 
     public static void setUpdateUI(IUpdateUI iUpdateUIInterface) {
@@ -45,19 +61,22 @@ public class SqlService extends IntentService {
         iLoadFinish = iLoadFinishInterface;
     }
 
+    /**
+     * 更新界面回调接口
+     */
     public interface IUpdateUI {
         void updateUI(Message message);
     }
 
+    /**
+     * 结束加载回调接口
+     */
     public interface ILoadFinish {
         void loadFinsh();
     }
 
     /**
      * 初始化请求参数
-     *
-     * @param text
-     * @return
      */
     private FamousInfoReq initParams(String text) {
         FamousInfoReq mFamousInfoReq = null;
@@ -71,16 +90,18 @@ public class SqlService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-//        Log.e(TAG, "SqlService onHandleIntent");
         //语言云每秒最大调用次数200次，防止调用过多
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        dao = new AnalyzeDao(SqlService.this);
+        dao = new AnalyzeDao(ParseTermService.this);
+        //获取需要请求的文字
         String requestText = intent.getStringExtra("poemString");
+        //获取总共的组数
         int total = intent.getIntExtra("total", 0);
+        //当前的组数
         int number = intent.getIntExtra("number", 0);
 
 // // 异步
@@ -108,32 +129,29 @@ public class SqlService extends IntentService {
 //                Log.i(TAG, "请求失败！");
 //            }
 //        });
-// 异步
+
+        // 同步请求可以根据顺序来
         Call<String> infoCall = famousInfoModel.queryLookUp(initParams(requestText));
         try {
             Response<String> response = infoCall.execute();
-//            Log.i(TAG, "请求成功！");
             String result = response.body().trim();
+            //解析数据
             CloudResultPlainParse parse = new CloudResultPlainParse();
             ArrayList<String> list = parse.parse(result);
             String strList = "";
-
-
             for (int i = 0; i < list.size(); i++) {
                 strList += list.get(i) + "\n";
-//                strList += list.get(i);
                 String word = list.get(i);
                 dbSave(word);
             }
+            //通知界面进行更新
             Message message = new Message();
             Bundle bundle = new Bundle();
             bundle.putString("something", strList);
             bundle.putInt("number", number);
             bundle.putInt("total", total);
-
             message.setData(bundle);
             iUpdateUI.updateUI(message);
-
         } catch (IOException e) {
             e.printStackTrace();
             Log.i(TAG, "请求失败！");
@@ -141,7 +159,7 @@ public class SqlService extends IntentService {
     }
 
     public void onDestroy() {
-        Log.i(TAG, " SqlService  destroy");
+        Log.i(TAG, " ParseTermService  destroy");
         iLoadFinish.loadFinsh();
         super.onDestroy();
     }
@@ -193,7 +211,7 @@ public class SqlService extends IntentService {
         if (isPunc(word)) {
             return;
         }
-//        Log.i(TAG, word);
+        //保存到数据库
         dao.checkAndCreate(word);
     }
 

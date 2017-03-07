@@ -4,7 +4,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
- *
+ * 数据库实体类
  */
 @DatabaseTable(tableName = "tb_analyze")
 public class AnalyzeBean {

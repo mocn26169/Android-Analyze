@@ -9,7 +9,9 @@ import com.mwf.analyze.utils.DatabaseHelper;
 import java.sql.SQLException;
 import java.util.List;
 
-
+/**
+ * 数据库操作类
+ */
 public class AnalyzeDao {
     public final String TAG = this.getClass().getName();
 
@@ -31,27 +33,17 @@ public class AnalyzeDao {
      * 增加
      */
     private void add(AnalyzeBean user) {
-        /*//事务操作
-        TransactionManager.callInTransaction(helper.getConnectionSource(),
-				new Callable<Void>()
-				{
-
-					@Override
-					public Void call() throws Exception
-					{
-						return null;
-					}
-				});*/
         try {
             daoOpe.create(user);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     /**
-     * 通过笔记本类型查询所有数据
+     * 检查已经存在字段
+     * 已经存在数量加一
+     * 没有存在新增一个
      */
     public void checkAndCreate(String word) {
         AnalyzeBean bean;
@@ -63,18 +55,15 @@ public class AnalyzeDao {
                 bean.setName(word);
                 //没有同样的直接新建一个
                 daoOpe.create(bean);
-//                Log.i(TAG, "没有同样的直接新建一个" + word);
             } else {
-                //有同样的数量加1
+                //有同样的数量加1并更新
                 int amount = bean.getAmount() + 1;
                 bean.setAmount(amount);
                 daoOpe.update(bean);
-//                Log.i(TAG, "有同样的数量加1"+word);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
 
     }
 
@@ -90,18 +79,23 @@ public class AnalyzeDao {
         }
         return list;
     }
+
     /**
-     * 查询所有数据
+     * 根据指定数量查询所有数据
+     * @param limit  限制数量
+     * @param orderBy false降序  true升序
+     * @return
      */
-    public List<AnalyzeBean> queryAll(int limit) {
+    public List<AnalyzeBean> queryAll(int limit,boolean orderBy) {
         List<AnalyzeBean> list = null;
         try {
-            list = daoOpe.queryBuilder().orderBy("amount", true).limit(limit).query();
+            list = daoOpe.queryBuilder().orderBy("amount", orderBy).limit(limit).query();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return list;
     }
+
     /**
      * 删除所有数据
      */
@@ -111,18 +105,6 @@ public class AnalyzeDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public AnalyzeBean get() {
-        try {
-            if (daoOpe.queryForAll() != null && daoOpe.queryForAll().size() > 0) {
-                return daoOpe.queryForAll().get(0);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 }

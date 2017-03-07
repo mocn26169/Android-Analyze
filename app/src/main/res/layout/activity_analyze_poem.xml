@@ -3,7 +3,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
->
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,8 +15,6 @@
             android:id="@+id/button_terms"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:text="词统计"/>
 
@@ -24,19 +22,22 @@
             android:id="@+id/button_word"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:text="字统计"/>
 
         <Button
-            android:id="@+id/button_excel"
+            android:id="@+id/button_clear"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="15dp"
             android:layout_weight="1"
-            android:text="数据统计-导出为excel"/>
+            android:text="清空数据"/>
+
+        <Button
+            android:id="@+id/button_export"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="导出数据"/>
     </LinearLayout>
 
     <ScrollView

@@ -1,9 +1,24 @@
 package com.mwf.analyze.utils;
 
+import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
+import android.widget.Toast;
+
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+
+import static android.R.attr.phoneNumber;
+import static android.content.ContentValues.TAG;
 
 /**
  * 文件管理工具
@@ -46,4 +61,48 @@ public class FileUtils {
         }
 
     }
+
+    public static boolean saveTxt(String content,Context context,String path){
+        //sd卡检测
+        String sdStatus = Environment.getExternalStorageState();
+        if(!sdStatus.equals(Environment.MEDIA_MOUNTED)){
+            Toast.makeText(context, "SD 卡不可用", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        //检测文件夹是否存在
+        File file = new File(path);
+        file.exists();
+        file.mkdirs();
+        String p = path+File.separator+"myexport.txt";
+        FileOutputStream outputStream = null;
+        try {
+            //创建文件，并写入内容
+            outputStream = new FileOutputStream(new File(p));
+            String msg = new String(content);
+            outputStream.write(msg.getBytes("GBK"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally{
+            if(outputStream!=null){
+                try {
+                    outputStream.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(context, "导出成功", Toast.LENGTH_SHORT).show();
+            }
+        }
+        return true;
+    }
+
 }

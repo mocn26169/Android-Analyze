@@ -2,6 +2,7 @@ package com.mwf.analyze.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -18,7 +19,8 @@ import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.mwf.analyze.R;
 import com.mwf.analyze.bean.AnalyzeBean;
 import com.mwf.analyze.dao.AnalyzeDao;
-import com.mwf.analyze.services.SqlService;
+import com.mwf.analyze.services.ParseTermService;
+import com.mwf.analyze.services.ParseWordsService;
 import com.mwf.analyze.utils.FileUtils;
 
 import java.io.File;
@@ -36,21 +38,18 @@ import butterknife.OnClick;
  * 3、开启IntentService对每组请求数据
  * 4、对返回数据进行处理
  */
-public class AnalyzePoemActivity extends AppCompatActivity implements View.OnClickListener, SqlService.IUpdateUI, SqlService.ILoadFinish {
+public class AnalyzePoemActivity extends AppCompatActivity implements View.OnClickListener, ParseTermService.IUpdateUI, ParseTermService.ILoadFinish, ParseWordsService.ILoadWorsdFinish {
 
     public final String TAG = this.getClass().getName();
-
-    /**
-     * 存入sql的列表
-     */
-    private ArrayList<String> sqlList = new ArrayList<>();
 
     @BindView(R.id.button_terms)
     Button button_terms;
     @BindView(R.id.button_word)
     Button button_word;
-    @BindView(R.id.button_excel)
-    Button button_excel;
+    @BindView(R.id.button_export)
+    Button button_export;
+    @BindView(R.id.button_clear)
+    Button button_clear;
     @BindView(R.id.txt_content)
     TextView mTxtContent;
 
@@ -60,17 +59,22 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_analyze_poem);
         ButterKnife.bind(this);
         getSupportActionBar().hide();
-        mTxtContent.setText("");
+
+        //显示上一次的数据
         AnalyzeDao dao = new AnalyzeDao(AnalyzePoemActivity.this);
-        List<AnalyzeBean> list = dao.queryAll(50);
+        List<AnalyzeBean> list = dao.queryAll(300, true);
         String text;
         for (int i = 0; i < list.size(); i++) {
             text = mTxtContent.getText().toString();
             text += (list.get(i).getName() + "       ==" + list.get(i).getAmount() + "个\n");
             mTxtContent.setText(text);
         }
+
     }
 
+    /**
+     * 打开文件选择器
+     */
     private void openFile(DialogSelectionListener listener) {
         DialogProperties properties = new DialogProperties();
         properties.selection_mode = DialogConfigs.SINGLE_MODE;
@@ -96,8 +100,7 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
                     readTermThread(files[0]);
                     //清空内容
                     mTxtContent.setText("");
-                    //清空数据库
-//                    new AnalyzeDao(AnalyzePoemActivity.this).deletedAll();
+
                 }
             }
         };
@@ -105,11 +108,10 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
     }
 
     /**
-     * 开启线程解析文件
-     *
-     * @param path 文件路径
+     * 开启线程读取文件内容
      */
     private void readTermThread(final String path) {
+
         //每组文字的长度
         final int arrayLength = 50;
 
@@ -122,11 +124,13 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
                     double d = new Double(Math.round(total / arrayLength));
                     int size = (int) (Math.ceil(d));
                     Log.e(TAG, "总长度=" + total);
-                    Log.e(TAG, "d==" + d);
+                    Log.e(TAG, "d=" + d);
                     Log.e(TAG, "分组=" + size);
-                    Intent intent = new Intent(AnalyzePoemActivity.this, SqlService.class);
-                    SqlService.setUpdateUI(AnalyzePoemActivity.this);
-                    SqlService.setLoadFinish(AnalyzePoemActivity.this);
+
+                    //初始化IntentService
+                    Intent intent = new Intent(AnalyzePoemActivity.this, ParseTermService.class);
+                    ParseTermService.setUpdateUI(AnalyzePoemActivity.this);
+                    ParseTermService.setLoadFinish(AnalyzePoemActivity.this);
                     //分组查询文字
                     for (int i = 0; i < size; i++) {
                         String singleString = "";
@@ -137,51 +141,40 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
                             //截取每一组的文字
                             singleString = string.substring(i * arrayLength, (i + 1) * arrayLength);
                         }
-
                         Log.e(TAG, "第" + i + "组");
                         Log.e(TAG, singleString);
+                        //将每组数据传送给IntentService做处理
                         intent.putExtra("poemString", singleString);
                         intent.putExtra("number", i);
                         intent.putExtra("total", size);
+                        //开启一个IntentService
                         startService(intent);
                     }
-
                 }
             }
         };
         mThread.start();
     }
 
-    @Override
-    @OnClick({R.id.button_terms, R.id.button_word, R.id.button_excel})
-    public void onClick(View view) {
-        if (view.getId() == R.id.button_terms) {
-            parseTerms();
-        } else if (view.getId() == R.id.button_word) {
-
-        } else if (view.getId() == R.id.button_excel) {
-
-        }
-    }
 
     @Override
     public void updateUI(Message message) {
-        mUIHandler.sendMessage(message);
+        UIHandler.sendMessage(message);
     }
 
-    private final Handler mUIHandler = new Handler() {
+    /**
+     * 更新UI操作
+     */
+    private final Handler UIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             Bundle bundle = msg.getData();
             String something = bundle.getString("something");
             double total = bundle.getInt("total", 0);
             double number = bundle.getInt("number", 0);
-            Log.e(TAG, "total=" + total + "   number" + number);
-            String text = mTxtContent.getText().toString() + something;
             double lastPercent = number / total * 100;
             DecimalFormat df = new DecimalFormat("#.##");
-            mTxtContent.setText("完成比例：  " +  df.format(lastPercent) + "%，请耐心等候！");
-//            Log.e(TAG, something);
+            mTxtContent.setText("完成比例：  " + df.format(lastPercent) + "%，请耐心等候！");
         }
     };
 
@@ -190,12 +183,15 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
         loadFinishHandler.sendEmptyMessage(0);
     }
 
+    /**
+     * 数据加载完毕操作
+     */
     private final Handler loadFinishHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             mTxtContent.setText("");
             AnalyzeDao dao = new AnalyzeDao(AnalyzePoemActivity.this);
-            List<AnalyzeBean> list = dao.queryAll(50);
+            List<AnalyzeBean> list = dao.queryAll(200, false);
             String text;
             for (int i = 0; i < list.size(); i++) {
                 text = mTxtContent.getText().toString();
@@ -204,4 +200,62 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
             }
         }
     };
+
+    /**
+     * 字统计
+     */
+    private void parseWords() {
+        DialogSelectionListener listener = new DialogSelectionListener() {
+            @Override
+            public void onSelectedFilePaths(String[] files) {
+                if (files != null && files.length >= 0) {
+                    //清空内容
+                    mTxtContent.setText("");
+                    //初始化IntentService
+                    Intent intent = new Intent(AnalyzePoemActivity.this, ParseWordsService.class);
+                    intent.putExtra("filePath", files[0]);
+                    startService(intent);
+                    ParseWordsService.setLoadFinish(AnalyzePoemActivity.this);
+                }
+            }
+        };
+        openFile(listener);
+    }
+
+    @Override
+    public void LoadWorsdFinish() {
+        loadFinishHandler.sendEmptyMessage(0);
+    }
+
+    /**
+     * 导出数据
+     */
+    private void export() {
+        AnalyzeDao dao = new AnalyzeDao(AnalyzePoemActivity.this);
+        List<AnalyzeBean> list = dao.queryAll();
+        String text = "";
+        for (int i = 0; i < list.size(); i++) {
+            text += (list.get(i).getName() + "       ==" + list.get(i).getAmount() + "个\n");
+        }
+        File file = Environment.getExternalStorageDirectory();
+        FileUtils.saveTxt(text, AnalyzePoemActivity.this, file.getAbsolutePath());
+    }
+
+    @Override
+    @OnClick({R.id.button_terms, R.id.button_word, R.id.button_export,R.id.button_clear})
+    public void onClick(View view) {
+        if (view.getId() == R.id.button_terms) {
+            parseTerms();
+        } else if (view.getId() == R.id.button_word) {
+            parseWords();
+        } else if (view.getId() == R.id.button_export) {
+            export();
+        }else if (view.getId() == R.id.button_clear) {
+            //清空数据库
+            new AnalyzeDao(AnalyzePoemActivity.this).deletedAll();
+            //清空内容
+            mTxtContent.setText("");
+        }
+    }
+
 }
