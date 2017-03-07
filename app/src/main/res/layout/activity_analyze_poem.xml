@@ -3,59 +3,46 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-    >
-
-    <RelativeLayout
-        android:id="@+id/search_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/edit_keyword"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_weight="1"
-            android:hint="请输入文字"
-            android:paddingLeft="10dp"
-            />
-
-
-    </RelativeLayout>
+>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
-        <Button
-            android:id="@+id/button_search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="15dp"
-            android:text="输入框解析"/>
 
         <Button
-            android:id="@+id/button_file"
-            android:layout_width="wrap_content"
+            android:id="@+id/button_terms"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/button_search"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="15dp"
-            android:text="文件解析"/>
+            android:layout_weight="1"
+            android:text="词统计"/>
+
+        <Button
+            android:id="@+id/button_word"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="15dp"
+            android:layout_weight="1"
+            android:text="字统计"/>
+
+        <Button
+            android:id="@+id/button_excel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="15dp"
+            android:layout_weight="1"
+            android:text="数据统计-导出为excel"/>
     </LinearLayout>
-
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/button_file"
+
         android:layout_margin="10dp">
 
         <LinearLayout

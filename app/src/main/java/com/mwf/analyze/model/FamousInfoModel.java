@@ -27,6 +27,7 @@ public class FamousInfoModel {
         return famousInfoModel;
     }
 
+
     public Call<String> queryLookUp(FamousInfoReq famousInfoReq) {
         Call<String > infoCall = mIFamousInfo.getFamousResult(famousInfoReq.api_key, famousInfoReq.text, famousInfoReq.pattern, famousInfoReq.format);
         return infoCall;

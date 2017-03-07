@@ -19,17 +19,19 @@ public class CloudResultPlainParse {
         this.statuses = statuses;
     }
 
+    /**
+     *     取出每一个单独的词
+     */
     public ArrayList<String> parse(String str) {
       if (!TextUtils.isEmpty(str)){
-
+          //换行分割
           String [] arr_1 = str.split("\n");
-
           for (int i = 0; i <arr_1.length ; i++) {
+              //空格分割
               String [] arr_2 = arr_1[i].split("\\s+");
               for (int j = 0; j <arr_2.length; j++) {
                   String result = arr_2[j];
                   statuses.add(result);
-
               }
           }
       }
