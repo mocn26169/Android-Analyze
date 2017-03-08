@@ -78,10 +78,10 @@ public class ParseWordsService extends IntentService {
                 String text = String.valueOf(chars[i]);
 //                Log.i(TAG, text);
                 dbSave(text);
-                double progress = i/total;
+                double progress = i / total * 100;
                 DecimalFormat df = new DecimalFormat("#.##");
 
-                iLoadUpdateUI.setLoadWorsdUpdateUI("进度："+df.format(progress)+"");
+                iLoadUpdateUI.setLoadWorsdUpdateUI("进度：" + df.format(progress) + "");
             }
         }
     }

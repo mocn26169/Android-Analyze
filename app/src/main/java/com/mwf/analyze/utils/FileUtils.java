@@ -22,15 +22,9 @@ import java.util.StringTokenizer;
  * 文件管理工具
  */
 public class FileUtils {
+
     /**
-     * 功能：Java读取txt文件的内容
-     * 步骤：1：先获得文件句柄
-     * 2：获得文件句柄当做是输入一个字节码流，需要对这个输入流进行读取
-     * 3：读取到输入流后，需要读取生成字节流
-     * 4：一行一行的输出。readline()。
-     * 备注：需要考虑的是异常情况
-     *
-     * @param filePath
+     *读取txt文件的内容
      */
     public static String readTxtFile(String filePath) {
         try {
@@ -62,11 +56,7 @@ public class FileUtils {
     }
 
     /**
-     * @param content      内容
-     * @param context      上下文
-     * @param path         路径
-     * @param fileFullName 全称，包括后缀
-     * @return
+     * 导出csv文件
      */
     public static boolean saveTxt(String content, Context context, String path, String fileFullName) {
         //sd卡检测

@@ -45,7 +45,7 @@ import butterknife.OnClick;
  */
 public class AnalyzePoemActivity extends AppCompatActivity implements View.OnClickListener, ParseTermService.IUpdateUI, ParseTermService.ILoadFinish, ParseWordsService.ILoadWorsdFinish, ParseWordsService.ILoadWorsdUpdateUI {
 
-    public final String TAG = this.getClass().getName();
+    private final String TAG = this.getClass().getName();
 
     @BindView(R.id.button_terms)
     Button button_terms;
@@ -60,7 +60,7 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
     @BindView(R.id.txt_content)
     TextView mTxtContent;
 
-    ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,16 +103,6 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
         progressDialog.dismiss();
     }
 
-    /**
-     * 更新UI操作
-     */
-    private final Handler dismissProgressHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            dismissProgress();
-            Toast.makeText(AnalyzePoemActivity.this, "导出成功", Toast.LENGTH_SHORT).show();
-        }
-    };
 
     /**
      * 打开文件选择器
@@ -220,13 +210,16 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
         }
     };
 
+    /**
+     * 分词加载完毕
+     */
     @Override
     public void loadFinsh() {
         loadFinishHandler.sendEmptyMessage(0);
     }
 
     /**
-     * 数据加载完毕操作
+     * 分词加载完毕
      */
     private final Handler loadFinishHandler = new Handler() {
         @Override
@@ -244,7 +237,7 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
     };
 
     /**
-     * 字统计
+     * 单字统计
      */
     private void parseWords() {
         DialogSelectionListener listener = new DialogSelectionListener() {
@@ -265,21 +258,39 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
         openFile(listener);
     }
 
+    /**
+     * 单字统计结束
+     */
     @Override
     public void LoadWorsdFinish() {
         loadFinishHandler.sendEmptyMessage(0);
     }
 
     /**
+     * 导出完成更新UI
+     */
+    private final Handler exportFinishHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            dismissProgress();
+            Toast.makeText(AnalyzePoemActivity.this, "导出成功", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    /**
      * 导出数据
      */
     private void export() {
+        //查询所有数据
         AnalyzeDao dao = new AnalyzeDao(AnalyzePoemActivity.this);
         final List<AnalyzeBean> list = dao.queryAll();
+
         if (list == null || list.size() == 0) {
             Toast.makeText(this, "查询不到数据", Toast.LENGTH_LONG).show();
             return;
         }
+
+        //显示一个输入导出的文件名的对话框
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.dialog_export, null);
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
@@ -318,17 +329,21 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
                 for (int i = 0; i < list.size(); i++) {
                     text += (list.get(i).getAmount() + "," + list.get(i).getName() + "\n");
                 }
-                final File file = Environment.getExternalStorageDirectory();
+
                 showProgress("正在导出，请稍后......");
 
                 final String finalText = text;
                 final String finalName = name;
 
+                //获取SDCard路径
+                final File file = Environment.getExternalStorageDirectory();
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        //保存文件
                         FileUtils.saveTxt(finalText, AnalyzePoemActivity.this, file.getAbsolutePath() + File.separator + "Download", finalName + ".csv");
-                        dismissProgressHandler.sendEmptyMessage(0);
+                        exportFinishHandler.sendEmptyMessage(0);
                     }
                 }).start();
 
@@ -337,6 +352,9 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
 
     }
 
+    /**
+     * 单字更新UI
+     */
     @Override
     public void setLoadWorsdUpdateUI(String text) {
         Message message = new Message();
@@ -345,19 +363,19 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
     }
 
     /**
-     * 更新UI操作
+     * 单字更新UI
      */
     private final Handler loadWorsUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            mTxtContent.setText(String.valueOf(msg.obj));
+            mTxtContent.setText(String.valueOf(msg.obj) + "%");
         }
     };
 
     /**
-     * 删除
+     * 清空数据结束更新UI
      */
-    private final Handler deleteUIHandler = new Handler() {
+    private final Handler clearFinishUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             dismissProgress();
@@ -369,13 +387,14 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
      */
     private void clear() {
         showProgress("正在清空，请稍后......");
+
         new Thread(new Runnable() {
             @Override
             public void run() {
                 //清空数据库
                 new AnalyzeDao(AnalyzePoemActivity.this).deletedAll();
                 Log.e(TAG, "清空完毕");
-                deleteUIHandler.sendEmptyMessage(0);
+                clearFinishUIHandler.sendEmptyMessage(0);
             }
         }).start();
         //清空内容
@@ -383,13 +402,14 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
     }
 
     /**
-     * 导入
+     * 导入数据完成UI更新
      */
-    private final Handler inportUIHandler = new Handler() {
+    private final Handler inportFinishUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             dismissProgress();
             Toast.makeText(AnalyzePoemActivity.this, "导入成功", Toast.LENGTH_SHORT).show();
+            //展示数据
             showData();
         }
     };
@@ -402,17 +422,23 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onSelectedFilePaths(final String[] files) {
                 if (files != null && files.length >= 0) {
+
                     showProgress("正在导入，请稍后......");
+
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            //读取文件
                             List<AnalyzeBean> list = FileUtils.readCSV(files[0]);
+
                             AnalyzeDao dao = new AnalyzeDao(AnalyzePoemActivity.this);
+                            //逐个检查合并数据
                             for (int i = 0; i < list.size(); i++) {
                                 dao.merge(list.get(i));
                             }
+
                             Log.e(TAG, "导入完毕");
-                            inportUIHandler.sendEmptyMessage(0);
+                            inportFinishUIHandler.sendEmptyMessage(0);
                         }
                     }).start();
 

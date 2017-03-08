@@ -68,16 +68,16 @@ public class AnalyzeDao {
     }
 
     /**
-     * 检查已经存在字段
-     * 已经存在数量加一
-     * 没有存在新增一个
+     * 检查是否已经存在
+     * 有则数量想加
+     * 没有则新增一个
      */
     public void merge(AnalyzeBean mBean) {
         AnalyzeBean sqlBean = null;
         try {
             sqlBean = daoOpe.queryBuilder().orderBy("id", false).where().eq("name", mBean.getName()).queryForFirst();
             if (sqlBean == null) {
-                //直接新建一个
+                //新建一个
                 daoOpe.create(mBean);
             } else {
                 //数量相加
@@ -95,6 +95,7 @@ public class AnalyzeDao {
     public List<AnalyzeBean> queryAll() {
         List<AnalyzeBean> list = null;
         try {
+            //根据数量降序查询
             list = daoOpe.queryBuilder().orderBy("amount", false).query();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -104,7 +105,6 @@ public class AnalyzeDao {
 
     /**
      * 根据指定数量查询所有数据
-     *
      * @param limit   限制数量
      * @param orderBy false降序  true升序
      * @return
@@ -125,11 +125,12 @@ public class AnalyzeDao {
     public void deletedAll() {
         try {
             List<AnalyzeBean> list = queryAll();
-            Log.e(TAG, "sise    " + list.size());
+            Log.e(TAG, "删除总数: " + list.size());
+
+            //遍历逐个删除
             for (int i = 0; i < list.size(); i++) {
                 daoOpe.delete(list.get(i));
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
