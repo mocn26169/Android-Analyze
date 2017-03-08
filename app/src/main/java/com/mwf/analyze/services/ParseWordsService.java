@@ -2,27 +2,16 @@ package com.mwf.analyze.services;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.mwf.analyze.Constant;
-import com.mwf.analyze.activity.AnalyzePoemActivity;
-import com.mwf.analyze.bean.CloudResultPlainParse;
-import com.mwf.analyze.bean.FamousInfoReq;
 import com.mwf.analyze.dao.AnalyzeDao;
-import com.mwf.analyze.model.FamousInfoModel;
 import com.mwf.analyze.utils.FileUtils;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.text.DecimalFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import retrofit2.Call;
-import retrofit2.Response;
 
 /**
  * 处理词的服务类
@@ -37,6 +26,11 @@ public class ParseWordsService extends IntentService {
     private static ILoadWorsdFinish iLoadFinish;
 
     /**
+     * 结束加载回调
+     */
+    private static ILoadWorsdUpdateUI iLoadUpdateUI;
+
+    /**
      * 数据库访问
      */
     private AnalyzeDao dao;
@@ -47,6 +41,11 @@ public class ParseWordsService extends IntentService {
 
     public static void setLoadFinish(ILoadWorsdFinish iLoadWordsFinishInterface) {
         iLoadFinish = iLoadWordsFinishInterface;
+
+    }
+
+    public static void setLoadWorsdUpdateUI(ILoadWorsdUpdateUI updateUI) {
+        iLoadUpdateUI = updateUI;
     }
 
     /**
@@ -54,6 +53,13 @@ public class ParseWordsService extends IntentService {
      */
     public interface ILoadWorsdFinish {
         void LoadWorsdFinish();
+    }
+
+    /**
+     * 更新界面回调接口
+     */
+    public interface ILoadWorsdUpdateUI {
+        void setLoadWorsdUpdateUI(String text);
     }
 
     @Override
@@ -67,10 +73,15 @@ public class ParseWordsService extends IntentService {
             //转单个字符
             char[] chars = new char[string.length()];
             chars = string.toCharArray();
+            double total = chars.length;
             for (int i = 0; i < string.length(); i++) {
                 String text = String.valueOf(chars[i]);
 //                Log.i(TAG, text);
                 dbSave(text);
+                double progress = i/total;
+                DecimalFormat df = new DecimalFormat("#.##");
+
+                iLoadUpdateUI.setLoadWorsdUpdateUI("进度："+df.format(progress)+"");
             }
         }
     }

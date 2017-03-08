@@ -1,6 +1,7 @@
 package com.mwf.analyze.dao;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
 import com.mwf.analyze.bean.AnalyzeBean;
@@ -64,7 +65,28 @@ public class AnalyzeDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
 
+    /**
+     * 检查已经存在字段
+     * 已经存在数量加一
+     * 没有存在新增一个
+     */
+    public void merge(AnalyzeBean mBean) {
+        AnalyzeBean sqlBean = null;
+        try {
+            sqlBean = daoOpe.queryBuilder().orderBy("id", false).where().eq("name", mBean.getName()).queryForFirst();
+            if (sqlBean == null) {
+                //直接新建一个
+                daoOpe.create(mBean);
+            } else {
+                //数量相加
+                sqlBean.setAmount((sqlBean.getAmount() + mBean.getAmount()));
+                daoOpe.update(sqlBean);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -82,11 +104,12 @@ public class AnalyzeDao {
 
     /**
      * 根据指定数量查询所有数据
-     * @param limit  限制数量
+     *
+     * @param limit   限制数量
      * @param orderBy false降序  true升序
      * @return
      */
-    public List<AnalyzeBean> queryAll(int limit,boolean orderBy) {
+    public List<AnalyzeBean> queryAll(int limit, boolean orderBy) {
         List<AnalyzeBean> list = null;
         try {
             list = daoOpe.queryBuilder().orderBy("amount", orderBy).limit(limit).query();
@@ -101,7 +124,12 @@ public class AnalyzeDao {
      */
     public void deletedAll() {
         try {
-            daoOpe.delete(queryAll());
+            List<AnalyzeBean> list = queryAll();
+            Log.e(TAG, "sise    " + list.size());
+            for (int i = 0; i < list.size(); i++) {
+                daoOpe.delete(list.get(i));
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -27,9 +27,12 @@
         </activity>
         <activity android:name=".activity.AnalyzePoemActivity">
         </activity>
+
         <service android:name=".services.ParseTermService"/>
         <service android:name=".services.ParseWordsService"/>
 
+        <activity android:name=".activity.WritePoetryActivity">
+        </activity>
     </application>
 
 </manifest>
