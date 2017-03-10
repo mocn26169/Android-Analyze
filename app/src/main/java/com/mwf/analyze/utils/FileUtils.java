@@ -2,7 +2,7 @@ package com.mwf.analyze.utils;
 
 import android.content.Context;
 import android.os.Environment;
-import android.widget.Toast;
+import android.text.TextUtils;
 
 import com.mwf.analyze.bean.AnalyzeBean;
 
@@ -24,7 +24,7 @@ import java.util.StringTokenizer;
 public class FileUtils {
 
     /**
-     *读取txt文件的内容
+     * 读取txt文件的内容
      */
     public static String readTxtFile(String filePath) {
         try {
@@ -38,8 +38,10 @@ public class FileUtils {
                 String lineTxt = null;
                 String result = "";
                 while ((lineTxt = bufferedReader.readLine()) != null) {
-                    System.out.println(lineTxt);
-                    result += lineTxt;
+                    if (!TextUtils.isEmpty(lineTxt)) {
+                        System.out.println(lineTxt);
+                        result += lineTxt;
+                    }
                 }
                 read.close();
                 return result;
@@ -62,7 +64,7 @@ public class FileUtils {
         //sd卡检测
         String sdStatus = Environment.getExternalStorageState();
         if (!sdStatus.equals(Environment.MEDIA_MOUNTED)) {
-            Toast.makeText(context, "SD 卡不可用", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "SD 卡不可用", Toast.LENGTH_SHORT).show();
             return false;
         }
         //检测文件夹是否存在

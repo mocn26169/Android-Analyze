@@ -134,24 +134,28 @@ public class ParseTermService extends IntentService {
         Call<String> infoCall = famousInfoModel.queryLookUp(initParams(requestText));
         try {
             Response<String> response = infoCall.execute();
-            String result = response.body().trim();
-            //解析数据
-            CloudResultPlainParse parse = new CloudResultPlainParse();
-            ArrayList<String> list = parse.parse(result);
-            String strList = "";
-            for (int i = 0; i < list.size(); i++) {
-                strList += list.get(i) + "\n";
-                String word = list.get(i);
-                dbSave(word);
+            String result = response.body();
+            if (response != null && !TextUtils.isEmpty(result)) {
+                //解析数据
+                CloudResultPlainParse parse = new CloudResultPlainParse();
+                ArrayList<String> list = parse.parse(result);
+                String strList = "";
+                for (int i = 0; i < list.size(); i++) {
+                    strList += list.get(i) + "\n";
+                    String word = list.get(i);
+                    dbSave(word);
+                }
+                //通知界面进行更新
+                Message message = new Message();
+                Bundle bundle = new Bundle();
+                bundle.putString("something", strList);
+                bundle.putInt("number", number);
+                bundle.putInt("total", total);
+                message.setData(bundle);
+                iUpdateUI.updateUI(message);
+            } else {
+                throw new IOException("请求字段为空");
             }
-            //通知界面进行更新
-            Message message = new Message();
-            Bundle bundle = new Bundle();
-            bundle.putString("something", strList);
-            bundle.putInt("number", number);
-            bundle.putInt("total", total);
-            message.setData(bundle);
-            iUpdateUI.updateUI(message);
         } catch (IOException e) {
             e.printStackTrace();
             Log.i(TAG, "请求失败！");

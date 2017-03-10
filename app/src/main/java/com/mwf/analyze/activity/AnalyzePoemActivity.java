@@ -80,6 +80,8 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
         //显示上一次的数据
         AnalyzeDao dao = new AnalyzeDao(AnalyzePoemActivity.this);
         List<AnalyzeBean> list = dao.queryAll(300, false);
+        List<AnalyzeBean> list2 = dao.queryAll();
+        Log.e(TAG, "总数：" + list2.size());
         String text;
         for (int i = 0; i < list.size(); i++) {
             text = mTxtContent.getText().toString();
@@ -317,6 +319,7 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onClick(View v) {
                 alertDialog.dismiss();
+                showProgress("正在导出，请稍后......");
 
                 String name = editText.getText().toString();
                 Log.e(TAG, "name=" + name);
@@ -325,14 +328,6 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
                     name = name.substring(5, name.length());
                 }
 
-                String text = "";
-                for (int i = 0; i < list.size(); i++) {
-                    text += (list.get(i).getAmount() + "," + list.get(i).getName() + "\n");
-                }
-
-                showProgress("正在导出，请稍后......");
-
-                final String finalText = text;
                 final String finalName = name;
 
                 //获取SDCard路径
@@ -341,8 +336,12 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        String text = "";
+                        for (int i = 0; i < list.size(); i++) {
+                            text += (list.get(i).getAmount() + "," + list.get(i).getName() + "\n");
+                        }
                         //保存文件
-                        FileUtils.saveTxt(finalText, AnalyzePoemActivity.this, file.getAbsolutePath() + File.separator + "Download", finalName + ".csv");
+                        FileUtils.saveTxt(text, AnalyzePoemActivity.this, file.getAbsolutePath() + File.separator + "Download", finalName + ".csv");
                         exportFinishHandler.sendEmptyMessage(0);
                     }
                 }).start();
