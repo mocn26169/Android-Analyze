@@ -10,6 +10,8 @@ import com.mwf.analyze.utils.DatabaseHelper;
 import java.sql.SQLException;
 import java.util.List;
 
+import static android.R.id.list;
+
 /**
  * 数据库操作类
  */
@@ -54,6 +56,7 @@ public class AnalyzeDao {
                 bean = new AnalyzeBean();
                 bean.setAmount(1);
                 bean.setName(word);
+                bean.setLength(word.length());
                 //没有同样的直接新建一个
                 daoOpe.create(bean);
             } else {
@@ -105,6 +108,7 @@ public class AnalyzeDao {
 
     /**
      * 根据指定数量查询所有数据
+     *
      * @param limit   限制数量
      * @param orderBy false降序  true升序
      * @return
@@ -117,6 +121,34 @@ public class AnalyzeDao {
             e.printStackTrace();
         }
         return list;
+    }
+
+    /**
+     * 根据指定数量查询所有数据
+     *
+     * @param length  长度
+     * @param orderBy false降序  true升序
+     * @return
+     */
+    public List<AnalyzeBean> queryAllByLength(int length, boolean orderBy) {
+        List<AnalyzeBean> list = null;
+        try {
+            list = daoOpe.queryBuilder().orderBy("amount", orderBy).where().eq("length", length).query();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * 删除数据
+     */
+    public void delete(AnalyzeBean mBean) {
+        try {
+            daoOpe.delete(mBean);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

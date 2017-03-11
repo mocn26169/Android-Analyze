@@ -122,6 +122,7 @@ public class FileUtils {
                     newBean = new AnalyzeBean();
                     newBean.setAmount(Integer.valueOf(result[0]));
                     newBean.setName(result[1]);
+                    newBean.setLength(result[1].length());
                     mList.add(newBean);
 //                    System.out.println("tokens_____" + str);
                 }

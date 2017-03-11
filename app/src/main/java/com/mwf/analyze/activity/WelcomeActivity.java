@@ -17,12 +17,14 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
-
+        toWritePoetry(null);
     }
+
     private void toActivity(Context _context, Class<? extends Activity> _class) {
         Intent intent = new Intent(_context, _class);
         startActivity(intent);
     }
+
     public void toMainActivity(View view) {
         Log.i(getClass().getSimpleName(), "toMainActivity");
         toActivity(this, MainActivity.class);
@@ -31,6 +33,11 @@ public class WelcomeActivity extends AppCompatActivity {
     public void toAnalyzePoem(View view) {
         Log.i(getClass().getSimpleName(), "toAnalyzePoem");
         toActivity(this, AnalyzePoemActivity.class);
+    }
+
+    public void toWritePoetry(View view) {
+        Log.i(getClass().getSimpleName(), "toWritePoetry");
+        toActivity(this, WritePoetryActivity.class);
     }
 
 }

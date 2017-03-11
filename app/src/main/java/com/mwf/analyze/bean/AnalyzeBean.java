@@ -26,6 +26,20 @@ public class AnalyzeBean {
     @DatabaseField(columnName = "amount")
     private int amount;
 
+    /**
+     * 长度
+     */
+    @DatabaseField(columnName = "length")
+    private int length;
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
+    }
+
     public int getId() {
         return id;
     }
@@ -49,4 +63,6 @@ public class AnalyzeBean {
     public void setAmount(int amount) {
         this.amount = amount;
     }
+
+
 }

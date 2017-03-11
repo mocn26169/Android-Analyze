@@ -3,22 +3,30 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:layout_height="match_parent"
->
+    >
 
     <Button
-        android:layout_marginTop="30dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
         android:onClick="toMainActivity"
         android:text="解析输入框和文件"/>
+
     <Button
-        android:layout_marginTop="30dp"
         android:layout_width="wrap_content"
-        android:onClick="toAnalyzePoem"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:onClick="toAnalyzePoem"
         android:text="解析诗词"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:onClick="toWritePoetry"
+        android:text="写诗词"/>
 
 </LinearLayout>
