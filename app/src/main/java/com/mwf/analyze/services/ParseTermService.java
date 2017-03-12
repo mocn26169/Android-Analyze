@@ -189,7 +189,7 @@ public class ParseTermService extends IntentService {
      * @return
      */
     public boolean isPunc(String str) {
-        Pattern patPunc = Pattern.compile("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]$·");
+        Pattern patPunc = Pattern.compile("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]$·〔〕＜＞");
         Matcher matcher = patPunc.matcher(str);
 
         if (matcher.find()) {

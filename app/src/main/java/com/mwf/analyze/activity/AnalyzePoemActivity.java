@@ -37,6 +37,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static android.R.id.list;
+
 /**
  * 1、打开文件
  * 2、开启子线程读取文件数据并分组
@@ -80,8 +82,6 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
         //显示上一次的数据
         AnalyzeDao dao = new AnalyzeDao(AnalyzePoemActivity.this);
         List<AnalyzeBean> list = dao.queryAll(300, false);
-        List<AnalyzeBean> list2 = dao.queryAll();
-        Log.e(TAG, "总数：" + list2.size());
         String text;
         for (int i = 0; i < list.size(); i++) {
             text = mTxtContent.getText().toString();
@@ -285,7 +285,12 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
     private void export() {
         //查询所有数据
         AnalyzeDao dao = new AnalyzeDao(AnalyzePoemActivity.this);
+        //查询全部
         final List<AnalyzeBean> list = dao.queryAll();
+
+        //查询倒数1000个
+//        final List<AnalyzeBean> list = dao.queryAll(1000, false);
+
 
         if (list == null || list.size() == 0) {
             Toast.makeText(this, "查询不到数据", Toast.LENGTH_LONG).show();
@@ -339,9 +344,15 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
                         String text = "";
                         for (int i = 0; i < list.size(); i++) {
                             text += (list.get(i).getAmount() + "," + list.get(i).getName() + "\n");
+//                                if (i % 10 == 0) {
+//                                    text += ("," + list.get(i).getName() + "\n");
+//                                } else {
+//                                    text += ("," + list.get(i).getName());
+//                            }
                         }
                         //保存文件
                         FileUtils.saveTxt(text, AnalyzePoemActivity.this, file.getAbsolutePath() + File.separator + "Download", finalName + ".csv");
+//                        FileUtils.saveTxt(text, AnalyzePoemActivity.this, file.getAbsolutePath() + File.separator + "Download", finalName + ".csv");
                         exportFinishHandler.sendEmptyMessage(0);
                     }
                 }).start();
