@@ -1,12 +1,12 @@
 package com.mwf.analyze.activity;
 
 import android.app.ProgressDialog;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Random;
 
 import butterknife.BindView;
-
-import static android.R.id.list;
 
 /**
  * 我用代码写首诗
@@ -114,7 +112,9 @@ public class WritePoetryActivity extends AppCompatActivity {
 //                    Log.e(TAG, "一个字=====>   " + oneWordsList.get(i).getName());
                     if (oneWordsList.get(i).getName().equals("纟") || oneWordsList.get(i).getName().equals("阝") || oneWordsList.get(i).getName().equals("」")
                             || oneWordsList.get(i).getName().equals("扌") || oneWordsList.get(i).getName().equals("～") || oneWordsList.get(i).getName().equals("「")
-                            || oneWordsList.get(i).getName().equals("衤") || oneWordsList.get(i).getName().equals("～") || oneWordsList.get(i).getName().equals("「")) {
+                            || oneWordsList.get(i).getName().equals("衤") || oneWordsList.get(i).getName().equals("」") || oneWordsList.get(i).getName().equals("·")
+                            || oneWordsList.get(i).getName().equals("〕") || oneWordsList.get(i).getName().equals("＜") || oneWordsList.get(i).getName().equals("〔")
+                            || oneWordsList.get(i).getName().equals("〕") || oneWordsList.get(i).getName().equals("＜") || oneWordsList.get(i).getName().equals("〔")) {
 
                         Log.e(TAG, "一个字=====>   " + oneWordsList.get(i).getName());
                         dao.delete(oneWordsList.get(i));
@@ -123,7 +123,7 @@ public class WritePoetryActivity extends AppCompatActivity {
                 for (int i = 0; i < twoWordsList.size(); i++) {
                     if (twoWordsList.get(i).getName().equals("氵邑") || twoWordsList.get(i).getName().equals("扌戚") || twoWordsList.get(i).getName().equals("氵爰")
                             || twoWordsList.get(i).getName().equals("鹿阝") || twoWordsList.get(i).getName().equals("灌「") || twoWordsList.get(i).getName().equals("氵项")
-                            || twoWordsList.get(i).getName().equals("豸区") || twoWordsList.get(i).getName().equals("灌「") || twoWordsList.get(i).getName().equals("氵项")) {
+                            || twoWordsList.get(i).getName().equals("豸区") || twoWordsList.get(i).getName().equals("囗囗") || twoWordsList.get(i).getName().equals("纟墨")) {
 
                         Log.e(TAG, "两个字=====>   " + twoWordsList.get(i).getName());
                         dao.delete(twoWordsList.get(i));
@@ -140,6 +140,9 @@ public class WritePoetryActivity extends AppCompatActivity {
      * 随机输出
      */
     private void randoOutput() {
+        if (oneWordsList.size()<=0){
+            return;
+        }
 //        write111();
         write12();
 //        write212();

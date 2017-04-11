@@ -37,8 +37,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static android.R.id.list;
-
 /**
  * 1、打开文件
  * 2、开启子线程读取文件数据并分组
@@ -354,6 +352,7 @@ public class AnalyzePoemActivity extends AppCompatActivity implements View.OnCli
                         FileUtils.saveTxt(text, AnalyzePoemActivity.this, file.getAbsolutePath() + File.separator + "Download", finalName + ".csv");
 //                        FileUtils.saveTxt(text, AnalyzePoemActivity.this, file.getAbsolutePath() + File.separator + "Download", finalName + ".csv");
                         exportFinishHandler.sendEmptyMessage(0);
+
                     }
                 }).start();
 
